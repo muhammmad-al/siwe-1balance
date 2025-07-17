@@ -1,0 +1,60 @@
+{
+  "sponsor": {
+    "address": "0x17a8d10B832d69a8c1389F686E7795ec8409F264",
+    "mainBalance": {
+      "id": "f0d86c3f-c89f-431f-875d-45fc11513180",
+      "totalSpentAmount": "130995084525482",
+      "totalValidRequestedWithdrawAmount": "0",
+      "totalDepositedAmount": "200000000000000000",
+      "totalWithdrawnAmount": "0",
+      "totalCreditRequested": "0",
+      "totalCreditReturned": "0",
+      "token": {
+        "id": "6d935903-2816-4f61-a744-f0d38ee267a3",
+        "chainId": 11155111,
+        "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "symbol": "ETH",
+        "decimals": 18,
+        "isActive": true,
+        "createdAt": "2023-12-15T11:21:42.813Z",
+        "updatedAt": "2023-12-15T11:21:42.813Z"
+      },
+      "isMain": true,
+      "updatedAt": "2025-07-14T22:28:43.099Z",
+      "createdAt": "2025-06-17T18:08:28.069Z",
+      "remainingBalance": "199869004915474518",
+      "amountInExecution": "0",
+      "remainingDebt": "0",
+      "maxCredit": "0"
+    },
+    "balances": [
+      {
+        "id": "f0d86c3f-c89f-431f-875d-45fc11513180",
+        "totalSpentAmount": "130995084525482",
+        "totalValidRequestedWithdrawAmount": "0",
+        "totalDepositedAmount": "200000000000000000",
+        "totalWithdrawnAmount": "0",
+        "totalCreditRequested": "0",
+        "totalCreditReturned": "0",
+        "token": {
+          "id": "6d935903-2816-4f61-a744-f0d38ee267a3",
+          "chainId": 11155111,
+          "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "symbol": "ETH",
+          "decimals": 18,
+          "isActive": true,
+          "createdAt": "2023-12-15T11:21:42.813Z",
+          "updatedAt": "2023-12-15T11:21:42.813Z"
+        },
+        "isMain": true,
+        "updatedAt": "2025-07-14T22:28:43.099Z",
+        "createdAt": "2025-06-17T18:08:28.069Z",
+        "remainingBalance": "199869004915474518",
+        "amountInExecution": "0",
+        "remainingDebt": "0",
+        "maxCredit": "0"
+      }
+    ]
+  },
+  "message": "getSponsorByAccountId"
+}

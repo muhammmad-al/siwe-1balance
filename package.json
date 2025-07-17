@@ -1,0 +1,31 @@
+{
+  "name": "siwe-1balance",
+  "version": "1.0.0",
+  "description": "1Balance transaction fetching with SIWE authentication",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node src/test.ts"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^17.2.0",
+    "ethers": "^6.15.0",
+    "siwe": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "1balance",
+    "siwe",
+    "transactions",
+    "gelato"
+  ],
+  "author": "",
+  "license": "MIT"
+}
