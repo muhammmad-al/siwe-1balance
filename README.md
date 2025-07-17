@@ -1,6 +1,6 @@
 # 1Balance Summary Fetcher
 
-A TypeScript script that fetches public 1Balance summary data for any sponsor address using the [Gelato 1Balance API](https://api.gelato.digital/1balance/networks/mainnets/sponsors/0x5bA202f6B346fc25e3bC839a21A428E24D491dda).
+A TypeScript script that fetches public 1Balance summary data for any sponsor address using the [Gelato 1Balance API](https://api.gelato.digital/1balance/networks/mainnets/sponsors/0x17a8d10B832d69a8c1389F686E7795ec8409F264).
 
 ## What This Does
 
