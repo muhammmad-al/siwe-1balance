@@ -1,9 +1,8 @@
 #!/usr/bin/env ts-node
 import axios from "axios";
 import { writeFileSync } from "fs";
-import { formatUnits } from "ethers";
 
-/* ---------- Types that reflect the public payload ---------- */
+/* ---------- Types for transfers API ---------- */
 interface ITokenInfo {
   id: string;
   chainId: number;
@@ -12,90 +11,74 @@ interface ITokenInfo {
   decimals: number;
 }
 
-interface IBalance {
+interface ITransfer {
   id: string;
+  type: "deposit" | "withdrawal" | "spend";
+  amount: string;
+  status: string;
   token: ITokenInfo;
-  /* raw integers as strings */
-  totalDepositedAmount: string;
-  totalWithdrawnAmount: string;
-  totalSpentAmount: string;
-  remainingBalance: string;
+  timestamp: string;
+  transactionHash?: string;
 }
 
-interface ISponsorPublic {
-  sponsor: {
-    address: string;
-    mainBalance: IBalance;
-    balances: IBalance[];
-  };
-  message: string; // "getSponsorByAccountId"
+interface ITransfersResponse {
+  transfers: ITransfer[];
+  message: string;
 }
 
 /* -------------------------- Helper ------------------------------------ */
-async function fetchSponsorSummary(
+async function fetchTransfers(
   sponsor: string,
-  network: "mainnets" | "testnets" = "mainnets"
-): Promise<ISponsorPublic> {
+  network: "mainnets" | "testnets" = "testnets",
+  limit: number = 50
+): Promise<ITransfersResponse> {
   const url =
     `https://api.gelato.digital/1balance/networks/${network}` +
-    `/sponsors/${sponsor}`;
+    `/sponsors/${sponsor}/transfers`;
 
-  const { data } = await axios.get<ISponsorPublic>(url);
+  const { data } = await axios.get<ITransfersResponse>(url, {
+    params: { limit },
+    timeout: 10_000,
+  });
   return data;
 }
 
 /* ----------------------------- Main ----------------------------------- */
 (async () => {
-  const sponsor =
-    (process.argv[2]?.toLowerCase() as `0x${string}`) ??
-    "0x17a8d10B832d69a8c1389F686E7795ec8409F264";
-  
-  const network = (process.argv[3] as "mainnets" | "testnets") ?? "mainnets";
+  // Get command line arguments
+  const sponsor = process.argv[2] || "0xbEE11A67084bb4E3EE067893a18DD1Ddc2255568";
+  const network = (process.argv[3] as "mainnets" | "testnets") || "testnets";
+  const limit = parseInt(process.argv[4]) || 50;
 
-  console.log(`Fetching public 1Balance summary for ${sponsor} on ${network}…`);
+  console.log(`🔍 Fetching transfers for sponsor: ${sponsor}`);
+  console.log(`🌐 Network: ${network}`);
+  console.log(`📊 Limit: ${limit}`);
 
-  const summary = await fetchSponsorSummary(sponsor, network);
-  const main = summary.sponsor.mainBalance;
+  try {
+    const data = await fetchTransfers(sponsor, network, limit);
 
-  /* human-readable balance (USDC 6-dec) */
-  const human = formatUnits(main.remainingBalance, main.token.decimals);
+    // Save to JSON file
+    const filename = `transfers-${sponsor.slice(0, 6)}-${network}.json`;
+    writeFileSync(filename, JSON.stringify(data, null, 2));
+    
+    console.log(`✅ Successfully fetched ${data.transfers?.length || 0} transfers`);
+    console.log(`📁 Data saved to: ${filename}`);
+    
+    // Display summary
+    if (data.transfers && data.transfers.length > 0) {
+      console.log("\n📋 Transfer Summary:");
+      data.transfers.forEach((transfer: ITransfer, index: number) => {
+        const amount = Number(transfer.amount) / Math.pow(10, transfer.token.decimals);
+        console.log(`${index + 1}. ${transfer.type} ${amount} ${transfer.token.symbol} (${transfer.status})`);
+      });
+    }
 
-  console.log("\n=== 1Balance Summary ===");
-  console.log(`Sponsor address : ${summary.sponsor.address}`);
-  console.log(
-    `Remaining      : ${human} ${main.token.symbol} on chain ${main.token.chainId}`
-  );
-  console.log(
-    `Total deposited: ${
-      Number(main.totalDepositedAmount) / 10 ** main.token.decimals
-    } ${main.token.symbol}`
-  );
-  console.log(
-    `Total spent    : ${
-      Number(main.totalSpentAmount) / 10 ** main.token.decimals
-    } ${main.token.symbol}`
-  );
-
-  if (summary.sponsor.balances.length > 1) {
-    console.log("\nOther fee tokens:");
-    summary.sponsor.balances
-      .filter(b => b.token.address !== main.token.address)
-      .forEach(b =>
-        console.log(
-          `  • ${b.token.symbol.padEnd(6)} ${b.token.address} (chain ${
-            b.token.chainId
-          })`
-        )
-      );
+    console.log(`\n📄 Full response saved to: ${filename}`);
+  } catch (error: any) {
+    console.error("❌ Error fetching transfers:", error.response?.data || error.message);
+    console.error("\nUsage: npm run test [sponsor_address] [network] [limit]");
+    console.error("  sponsor_address: Ethereum address (default: 0xbEE11A67084bb4E3EE067893a18DD1Ddc2255568)");
+    console.error("  network: 'mainnets' or 'testnets' (default: testnets)");
+    console.error("  limit: number of transfers (default: 50)");
   }
-
-  const file = `summary-${sponsor.slice(0, 6)}.json`;
-  writeFileSync(file, JSON.stringify(summary, null, 2));
-  console.log(`\nRaw JSON saved to ./${file}`);
-})().catch(err => {
-  console.error("❌ Error while calling public API");
-  console.error(err.message ?? err);
-  console.error("\nUsage: npm run test [sponsor_address] [network]");
-  console.error("  sponsor_address: Ethereum address (default: 0x17a8d10B832d69a8c1389F686E7795ec8409F264)");
-  console.error("  network: 'mainnets' or 'testnets' (default: mainnets)");
-});
+})().catch(console.error);
